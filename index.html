@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="King of the Kill 2017 on your own PC: the September 2017 client, a local server with the 2017 rules and a one-button launcher.">
+<title>h1z1.app</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;500;600&display=swap">
+<style>
+  /* Layout: one dark column, sections as full-width bands; a single red accent used for the torn stripe, CTA and markers. */
+  :root {
+    --bg: #0b0b0c;
+    --panel: #141416;
+    --line: #2a2a2e;
+    --fg: #ededee;
+    --muted: #9a9aa2;
+    --dim: #626268;
+    --red: #d7191f;
+    --red-deep: #8a0f14;
+    --green: #3fae4a;
+    --display: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+    --body: "Barlow", "Segoe UI", Arial, sans-serif;
+    --mono: ui-monospace, Consolas, "Courier New", monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 17px; line-height: 1.55; margin: 0; }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+  a { color: inherit; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .eyebrow { font-family: var(--display); font-weight: 800; font-size: 13px; letter-spacing: .22em; text-transform: uppercase; color: var(--red); }
+  h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: .95; text-transform: uppercase; }
+  h2 { font-size: clamp(34px, 5vw, 52px); font-weight: 800; }
+  h3 { font-size: 22px; font-weight: 700; letter-spacing: .02em; }
+  p { margin: 0; }
+  .lede { color: var(--muted); max-width: 62ch; }
+
+  /* top bar */
+  .top { border-bottom: 1px solid var(--line); background: rgba(11,11,12,.92); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; backdrop-filter: blur(6px); }
+  .top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; }
+  .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .brand .mark { width: 10px; height: 34px; background: var(--red); transform: skewX(-12deg); }
+  .brand b { font-family: var(--display); font-weight: 800; letter-spacing: .04em; font-size: 22px; text-transform: lowercase; }
+  .brand small { display: block; font-size: 11px; letter-spacing: .2em; color: var(--muted); font-weight: 600; }
+  nav { display: flex; gap: 22px; font-family: var(--display); font-weight: 600; letter-spacing: .1em; text-transform: uppercase; font-size: 14px; }
+  nav a { text-decoration: none; color: var(--muted); }
+  nav a:hover, nav a:focus-visible { color: var(--fg); }
+
+  /* hero */
+  .hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--line); }
+  .hero .grit { position: absolute; inset: 0; opacity: .35; background:
+      radial-gradient(1200px 500px at 85% 10%, rgba(215,25,31,.22), transparent 60%),
+      repeating-linear-gradient(135deg, rgba(255,255,255,.025) 0 2px, transparent 2px 7px); }
+  .hero .wrap { position: relative; padding-block: 72px 64px; display: grid; grid-template-columns: 1.2fr .8fr; gap: 40px; align-items: end; }
+  .title { font-size: clamp(64px, 11vw, 148px); font-weight: 800; letter-spacing: -.01em; }
+  .title .of { display: block; font-size: .42em; letter-spacing: .12em; color: var(--muted); padding-left: .08em; }
+  .stripe { width: 92px; height: 8px; background: var(--red); margin: 26px 0 18px; clip-path: polygon(0 0, 100% 0, 94% 100%, 4% 100%); }
+  .tag { font-family: var(--display); font-weight: 800; font-size: clamp(26px, 3.4vw, 40px); text-transform: uppercase; letter-spacing: .02em; }
+  .hero .lede { margin-top: 14px; }
+  .cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+  .btn { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-family: var(--display); font-weight: 800; letter-spacing: .1em; text-transform: uppercase; font-size: 17px; padding: 16px 26px; border: 1px solid var(--line); background: var(--panel); min-width: 0; }
+  .btn.primary { background: linear-gradient(var(--red), #b2101a); border-color: transparent; }
+  .btn.primary:hover, .btn.primary:focus-visible { background: linear-gradient(#f22c32, #c8161c); }
+  .btn:hover, .btn:focus-visible { border-color: var(--muted); }
+  .btn .sub { font-family: var(--body); font-weight: 500; letter-spacing: 0; text-transform: none; font-size: 13px; color: rgba(255,255,255,.75); }
+  .facts { display: grid; gap: 10px; align-self: end; }
+  .fact { display: grid; grid-template-columns: 110px 1fr; gap: 12px; padding: 12px 14px; border: 1px solid var(--line); background: rgba(20,20,22,.8); font-size: 15px; }
+  .fact b { font-family: var(--display); font-weight: 800; letter-spacing: .12em; font-size: 13px; color: var(--red); align-self: center; }
+  .fact span { color: var(--muted); }
+
+  /* bands */
+  section .wrap { padding-block: 64px; }
+  .band { border-bottom: 1px solid var(--line); }
+  .head { display: grid; gap: 10px; margin-bottom: 34px; }
+  .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .card { border: 1px solid var(--line); background: var(--panel); padding: 22px 22px 24px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+  .card h3 { padding-left: 14px; border-left: 4px solid var(--red); }
+  .card p { color: var(--muted); font-size: 15.5px; }
+  .card .size { font-family: var(--mono); font-size: 13px; color: var(--dim); font-variant-numeric: tabular-nums; }
+
+  /* patch list */
+  .patch { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 40px; }
+  .patch div { display: grid; grid-template-columns: 170px 1fr; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line); min-width: 0; }
+  .patch b { font-family: var(--display); font-weight: 700; letter-spacing: .1em; font-size: 15px; padding-left: 12px; border-left: 3px solid var(--red); }
+  .patch span { color: var(--muted); font-size: 15.5px; }
+
+  /* steps (a real sequence) */
+  .steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; counter-reset: step; }
+  .step { border: 1px solid var(--line); background: var(--panel); padding: 22px; display: grid; gap: 10px; align-content: start; min-width: 0; position: relative; }
+  .step::before { counter-increment: step; content: counter(step); display: grid; place-items: center; width: 34px; height: 34px; background: var(--red); color: #fff; font-family: var(--display); font-weight: 800; font-size: 18px; }
+  .step p { color: var(--muted); font-size: 15.5px; }
+  .step code { font-family: var(--mono); font-size: 13.5px; background: #0b0b0c; border: 1px solid var(--line); padding: 2px 6px; }
+
+  /* requirements */
+  .req { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+  .req div { border: 1px solid var(--line); padding: 18px 20px; display: grid; gap: 6px; min-width: 0; }
+  .req b { font-family: var(--display); font-weight: 800; letter-spacing: .08em; font-size: 17px; }
+  .req span { color: var(--muted); font-size: 15px; }
+  .note { margin-top: 18px; color: var(--muted); font-size: 15px; max-width: 70ch; }
+  .note .ok { color: var(--green); font-weight: 600; }
+
+  /* faq */
+  .faq { display: grid; gap: 0; max-width: 760px; }
+  .faq details { border-bottom: 1px solid var(--line); }
+  .faq summary { cursor: pointer; list-style: none; padding: 16px 0; font-family: var(--display); font-weight: 700; font-size: 20px; letter-spacing: .02em; text-transform: uppercase; display: flex; justify-content: space-between; gap: 16px; }
+  .faq summary::after { content: "+"; color: var(--red); font-weight: 800; }
+  .faq details[open] summary::after { content: "\2013"; }
+  .faq summary:focus-visible { outline: 2px solid var(--red); outline-offset: 4px; }
+  .faq p { color: var(--muted); padding-bottom: 18px; max-width: 65ch; }
+
+  /* download */
+  .download .wrap { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; }
+  .dl-box { border: 1px solid var(--line); background: var(--panel); padding: 26px; display: grid; gap: 14px; }
+  .dl-box .row { display: flex; justify-content: space-between; gap: 16px; font-size: 15px; border-bottom: 1px solid var(--line); padding-bottom: 10px; }
+  .dl-box .row span:first-child { color: var(--muted); }
+  .dl-box .row span:last-child { font-family: var(--mono); font-size: 13.5px; font-variant-numeric: tabular-nums; text-align: right; }
+  .pending { font-size: 14px; color: var(--muted); }
+  .pending b { color: #e8a800; }
+
+  footer .wrap { padding-block: 34px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; color: var(--dim); font-size: 13.5px; }
+
+  @media (max-width: 820px) {
+    .hero .wrap { grid-template-columns: 1fr; }
+    .grid, .req, .steps { grid-template-columns: 1fr 1fr; }
+    .patch { grid-template-columns: 1fr; }
+    .download .wrap { grid-template-columns: 1fr; }
+    nav { display: none; }
+  }
+  @media (max-width: 520px) {
+    .grid, .req, .steps { grid-template-columns: 1fr; }
+    .patch div { grid-template-columns: 1fr; gap: 4px; }
+    .fact { grid-template-columns: 1fr; gap: 2px; }
+    section .wrap { padding-block: 48px; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .hero .title { animation: rise .6s ease-out both; }
+    .hero .tag, .hero .lede, .hero .cta { animation: rise .6s ease-out .12s both; }
+    @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  }
+</style>
+</head>
+<body>
+
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="mark"></span><span><b>h1z1.app</b><small>KING OF THE KILL · 2017</small></span></a>
+    <nav>
+      <a href="#whats-in">What's in it</a>
+      <a href="#restored">Restored</a>
+      <a href="#install">Install</a>
+      <a href="#faq">FAQ</a>
+      <a href="#download">Download</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <div class="grit" aria-hidden="true"></div>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">H1Z1 · Battle Royale · September 2017</div>
+      <h1 class="title">King<span class="of">of the</span>Kill</h1>
+      <div class="stripe" aria-hidden="true"></div>
+      <div class="tag">Back to 2017.</div>
+      <p class="lede">The September 2017 King of the Kill, running on your own computer. One download gives you the game client, a local server with the 2017 rules and a launcher that starts both with one button.</p>
+      <div class="cta">
+        <a class="btn primary" href="#download">Download setup <span class="sub">16 GB · Windows</span></a>
+        <a class="btn" href="#install">How to install</a>
+      </div>
+    </div>
+    <div class="facts">
+      <div class="fact"><b>CLIENT</b><span>0.0.134.227809 — the last September 2017 build</span></div>
+      <div class="fact"><b>MODE</b><span>Training Ground with bots, every gun laid out around you</span></div>
+      <div class="fact"><b>SERVER</b><span>Runs locally on your PC. No account, no internet needed to play</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="whats-in">
+  <div class="wrap">
+    <div class="head">
+      <div class="eyebrow">What's in the download</div>
+      <h2>Everything in one setup</h2>
+      <p class="lede">Run Setup.exe, choose a folder, and it installs all three parts. When it finishes it opens the launcher by itself.</p>
+    </div>
+    <div class="grid">
+      <div class="card"><h3>Game client</h3><p>The patched 2017 client, ready to connect to the local server. No Steam, no Daybreak login.</p><span class="size">15.6 GB · depot_433851</span></div>
+      <div class="card"><h3>Server + launcher</h3><p>The private server with every 2017 fix, plus the launcher: one PLAY button, a Testing / Stable build switch, and a file check for the game.</p><span class="size">650 MB · Node.js</span></div>
+      <div class="card"><h3>Your character</h3><p>A ready character with skins, so you load straight into the Training Ground instead of an empty wardrobe.</p><span class="size">saves · %APPDATA%\2017KOTK</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="restored">
+  <div class="wrap">
+    <div class="head">
+      <div class="eyebrow">Restored so far</div>
+      <h2>How it played in 2017</h2>
+      <p class="lede">The 2016 server code only knew the old game. These are the parts rebuilt to match the September 2017 client.</p>
+    </div>
+    <div class="patch">
+      <div><b>AK-47</b><span>2017 recoil, fire rate and the v4 gunshot</span></div>
+      <div><b>AR-15</b><span>V recoil, v3 gunshot, 2017 model and skins</span></div>
+      <div><b>TRAINING GROUND</b><span>Play tab mode: bots in 2017 gear, a ring of every gun with its ammo at spawn</span></div>
+      <div><b>SKINS</b><span>Gun, clothing, helmet and backpack skins render; right-click to apply yours</span></div>
+      <div><b>KILL FEED</b><span>Bot kills show in the feed, named Bot 1, Bot 2, Bot 3</span></div>
+      <div><b>CRAFTING</b><span>Panel and recipes match the 2017 guide, ingredients included</span></div>
+      <div><b>INVENTORY</b><span>KOTK slot layout, hotbar, drag to Carrying, loot pickup feed</span></div>
+      <div><b>RELOAD</b><span>Magazine and reserve counts match the HUD for every gun</span></div>
+      <div><b>EXIT MATCH</b><span>5-second wheel, then back to the main menu like the real thing</span></div>
+      <div><b>CAMERA</b><span>Classic, Static and Dynamic tuned; binoculars on key 5</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="install">
+  <div class="wrap">
+    <div class="head">
+      <div class="eyebrow">Install</div>
+      <h2>Four steps, about ten minutes</h2>
+    </div>
+    <div class="steps">
+      <div class="step"><h3>Download</h3><p>Get <code>H1Z1-2017-Setup.zip</code> (16 GB) and unzip it anywhere. You need about 17 GB free on the drive you install to.</p></div>
+      <div class="step"><h3>Run Setup.exe</h3><p>Pick the install folder. The server goes to <code>server</code>, the game to <code>depot_433851</code> inside it.</p></div>
+      <div class="step"><h3>Requirements</h3><p>Setup checks for Node.js, Git for Windows and Python 3. Anything missing installs with one click.</p></div>
+      <div class="step"><h3>Press PLAY</h3><p>The launcher opens by itself. Press PLAY, then in the game menu choose <code>PLAY</code> → <code>TRAINING GROUND</code>.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="requirements">
+  <div class="wrap">
+    <div class="head">
+      <div class="eyebrow">Requirements</div>
+      <h2>What your PC needs</h2>
+    </div>
+    <div class="req">
+      <div><b>WINDOWS 10 / 11</b><span>64-bit. The server and the game run on the same PC.</span></div>
+      <div><b>17 GB FREE</b><span>16 GB game client plus the server. An SSD makes loading much faster.</span></div>
+      <div><b>THREE FREE TOOLS</b><span>Node.js runs the server, Git for Windows provides bash for the start scripts, Python 3 runs the game helpers.</span></div>
+    </div>
+    <p class="note">The setup wizard checks all three and shows <span class="ok">FOUND</span> or <span class="ok">MISSING</span> for each, with an install button for the missing ones. Nothing else to configure.</p>
+  </div>
+</section>
+
+<section class="band" id="faq">
+  <div class="wrap">
+    <div class="head">
+      <div class="eyebrow">FAQ</div>
+      <h2>Questions</h2>
+    </div>
+    <div class="faq">
+      <details><summary>Can I play with friends?</summary><p>Not yet. The server runs on your own PC and the Training Ground is single player with bots. Multiplayer is the next big piece.</p></details>
+      <details><summary>Is this the real 2017 game?</summary><p>The client is the real 0.0.134 build from September 2017. The server side is rebuilt from scratch, so some things are still missing. The Restored list above is what works today.</p></details>
+      <details><summary>Something looks broken. What do I check first?</summary><p>Open the launcher's settings (the gear) and press Verify game files. It checks every file of the game against the known-good list and can repair damaged ones from the setup package.</p></details>
+      <details><summary>Testing or Stable build?</summary><p>Testing is the newest server build and gets the fixes first. Stable is the last build frozen as known good. Switch between them in the launcher settings; PLAY starts whichever is selected.</p></details>
+      <details><summary>Does it touch my Steam install?</summary><p>No. It installs into its own folder and saves to %APPDATA%\2017KOTK. Steam and the live game are not involved.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="download" id="download">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Download</div>
+      <h2>Get the setup</h2>
+      <p class="lede" style="margin-top:12px">One zip with Setup.exe, the server, the launcher and the full game client. Unzip, run, play.</p>
+      <div class="cta">
+        <a class="btn primary" id="dl" href="#download">Download H1Z1-2017-Setup.zip <span class="sub">16 GB</span></a>
+      </div>
+      <p class="pending" id="pending"><b>Link coming:</b> the upload isn't finished yet. This button will point at it as soon as it is.</p>
+    </div>
+    <div class="dl-box">
+      <div class="row"><span>File</span><span>H1Z1-2017-Setup.zip</span></div>
+      <div class="row"><span>Size</span><span>about 16 GB</span></div>
+      <div class="row"><span>Client</span><span>0.0.134.227809</span></div>
+      <div class="row"><span>Runs on</span><span>Windows 10 / 11, 64-bit</span></div>
+      <div class="row"><span>Needs</span><span>Node.js · Git · Python 3</span></div>
+      <div class="row"><span>Installs to</span><span>a folder you choose</span></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>h1z1.app — King of the Kill 2017 private server. A fan project; not affiliated with Daybreak Game Company.</span>
+    <span>Client 0.0.134 · Setup 1.0</span>
+  </div>
+</footer>
+
+<script>
+  // Download link: set DOWNLOAD_URL once the zip is uploaded; the button and the note follow.
+  var DOWNLOAD_URL = "";
+  (function () {
+    var a = document.getElementById("dl"), p = document.getElementById("pending");
+    if (DOWNLOAD_URL) { a.href = DOWNLOAD_URL; a.target = "_blank"; a.rel = "noopener"; p.hidden = true; }
+  })();
+</script>
+
+</body>
+</html>
