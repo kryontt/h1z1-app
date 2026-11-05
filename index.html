@@ -165,7 +165,7 @@
       <div class="tag">Back to 2017.</div>
       <p class="lede">The September 2017 King of the Kill, running on your own computer. One download gives you the game client, a local server with the 2017 rules and a launcher that starts both with one button.</p>
       <div class="cta">
-        <a class="btn primary" href="#download">Download setup <span class="sub">16 GB · Windows</span></a>
+        <a class="btn primary" href="https://github.com/kryontt/h1z1-app/releases/latest/download/Setup.exe" target="_blank" rel="noopener">Download setup <span class="sub">1 MB · installs 16 GB</span></a>
         <a class="btn" href="#install">How to install</a>
       </div>
     </div>
@@ -221,8 +221,8 @@
       <h2>Four steps, about ten minutes</h2>
     </div>
     <div class="steps">
-      <div class="step"><h3>Download</h3><p>Get <code>H1Z1-2017-Setup.zip</code> (16 GB) and unzip it anywhere. You need about 17 GB free on the drive you install to.</p></div>
-      <div class="step"><h3>Run Setup.exe</h3><p>Pick the install folder. The server goes to <code>server</code>, the game to <code>depot_433851</code> inside it.</p></div>
+      <div class="step"><h3>Download</h3><p>Get <code>Setup.exe</code> (1 MB). Windows may warn about an unknown publisher: choose More info → Run anyway.</p></div>
+      <div class="step"><h3>Run Setup.exe</h3><p>Pick the install folder; it needs about 18 GB free. Setup downloads the game, server and launcher straight into it, and resumes if the connection drops.</p></div>
       <div class="step"><h3>Requirements</h3><p>Setup checks for Node.js, Git for Windows and Python 3. Anything missing installs with one click.</p></div>
       <div class="step"><h3>Press PLAY</h3><p>The launcher opens by itself. Press PLAY, then in the game menu choose <code>PLAY</code> → <code>TRAINING GROUND</code>.</p></div>
     </div>
@@ -265,19 +265,20 @@
     <div>
       <div class="eyebrow">Download</div>
       <h2>Get the setup</h2>
-      <p class="lede" style="margin-top:12px">One zip with Setup.exe, the server, the launcher and the full game client. Unzip, run, play.</p>
+      <p class="lede" style="margin-top:12px">A 1 MB setup that downloads the game, the server and the launcher for you. Run it, pick a folder, play.</p>
       <div class="cta">
-        <a class="btn primary" id="dl" href="#download">Download H1Z1-2017-Setup.zip <span class="sub">16 GB</span></a>
+        <a class="btn primary" id="dl" href="#download">Download Setup.exe <span class="sub">1 MB</span></a>
       </div>
-      <p class="pending" id="pending"><b>Link coming:</b> the upload isn't finished yet. This button will point at it as soon as it is.</p>
+      <p class="pending" id="pending"><b>Upload in progress:</b> the 16 GB build is still going up. The button works as soon as it's there.</p>
     </div>
     <div class="dl-box">
-      <div class="row"><span>File</span><span>H1Z1-2017-Setup.zip</span></div>
-      <div class="row"><span>Size</span><span>about 16 GB</span></div>
+      <div class="row"><span>File</span><span>Setup.exe</span></div>
+      <div class="row"><span>Download</span><span>about 16 GB, in 2 GB pieces</span></div>
       <div class="row"><span>Client</span><span>0.0.134.227809</span></div>
       <div class="row"><span>Runs on</span><span>Windows 10 / 11, 64-bit</span></div>
       <div class="row"><span>Needs</span><span>Node.js · Git · Python 3</span></div>
-      <div class="row"><span>Installs to</span><span>a folder you choose</span></div>
+      <div class="row"><span>Installs to</span><span>a folder you choose (18 GB free)</span></div>
+      <div class="row"><span>Source</span><span><a href="https://github.com/kryontt/h1z1-app" target="_blank" rel="noopener">github.com/kryontt/h1z1-app</a></span></div>
     </div>
   </div>
 </section>
@@ -291,7 +292,7 @@
 
 <script>
   // Download link: set DOWNLOAD_URL once the zip is uploaded; the button and the note follow.
-  var DOWNLOAD_URL = "";
+  var DOWNLOAD_URL = "https://github.com/kryontt/h1z1-app/releases/latest/download/Setup.exe";
   (function () {
     var a = document.getElementById("dl"), p = document.getElementById("pending");
     if (DOWNLOAD_URL) { a.href = DOWNLOAD_URL; a.target = "_blank"; a.rel = "noopener"; p.hidden = true; }
