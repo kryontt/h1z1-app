@@ -165,7 +165,7 @@
       <div class="tag">Back to 2017.</div>
       <p class="lede">The September 2017 King of the Kill, running on your own computer. One download gives you the game client, a local server with the 2017 rules and a launcher that starts both with one button.</p>
       <div class="cta">
-        <a class="btn primary" href="https://github.com/kryontt/h1z1-app/releases/latest/download/Setup.exe" target="_blank" rel="noopener">Download setup <span class="sub">1 MB · installs 16 GB</span></a>
+        <a class="btn primary" id="dl-hero" href="#download">Download setup <span class="sub">1 MB · installs 16 GB</span></a>
         <a class="btn" href="#install">How to install</a>
       </div>
     </div>
@@ -269,7 +269,7 @@
       <div class="cta">
         <a class="btn primary" id="dl" href="#download">Download Setup.exe <span class="sub">1 MB</span></a>
       </div>
-      <p class="pending" id="pending"><b>Upload in progress:</b> the 16 GB build is still going up. The button works as soon as it's there.</p>
+      <p class="pending" id="pending"><b>Not available yet:</b> the 16 GB build is still uploading. Check back in a few hours; the button goes live by itself.</p>
     </div>
     <div class="dl-box">
       <div class="row"><span>File</span><span>Setup.exe</span></div>
@@ -292,10 +292,14 @@
 
 <script>
   // Download link: set DOWNLOAD_URL once the zip is uploaded; the button and the note follow.
-  var DOWNLOAD_URL = "https://github.com/kryontt/h1z1-app/releases/latest/download/Setup.exe";
+  var DOWNLOAD_URL = "";  // set to the release's Setup.exe once the upload is live
   (function () {
-    var a = document.getElementById("dl"), p = document.getElementById("pending");
-    if (DOWNLOAD_URL) { a.href = DOWNLOAD_URL; a.target = "_blank"; a.rel = "noopener"; p.hidden = true; }
+    var p = document.getElementById("pending");
+    ["dl", "dl-hero"].forEach(function (id) {
+      var a = document.getElementById(id);
+      if (DOWNLOAD_URL) { a.href = DOWNLOAD_URL; a.target = "_blank"; a.rel = "noopener"; }
+    });
+    if (DOWNLOAD_URL) p.hidden = true;
   })();
 </script>
 
