@@ -5,199 +5,323 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="King of the Kill 2017 on your own PC: the September 2017 client, a local server with the 2017 rules and a one-button launcher.">
 <title>h1z1.app</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap">
 <style>
-  /* Layout: one dark column, sections as full-width bands; a single red accent used for the torn stripe, CTA and markers. */
+  /* Layout: full-bleed dark bands, red smoke hero, mono "NN / LABEL" meta rows, giant stacked display type. Single dark look by choice. */
   :root {
-    --bg: #0b0b0c;
-    --panel: #141416;
-    --line: #2a2a2e;
-    --fg: #ededee;
-    --muted: #9a9aa2;
-    --dim: #626268;
-    --red: #d7191f;
-    --red-deep: #8a0f14;
+    --bg: #0a0a0a;
+    --bg2: #111112;
+    --panel: #161617;
+    --line: #2b2b2e;
+    --fg: #f2f2f2;
+    --muted: #a3a3aa;
+    --dim: #6a6a72;
+    --red: #e3161c;
+    --red-glow: #ff2a30;
+    --red-deep: #5a0a0d;
     --green: #3fae4a;
-    --display: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+    --display: "Anton", "Impact", "Arial Narrow", sans-serif;
+    --cond: "Barlow Condensed", "Arial Narrow", sans-serif;
     --body: "Barlow", "Segoe UI", Arial, sans-serif;
-    --mono: ui-monospace, Consolas, "Courier New", monospace;
+    --mono: "Space Mono", ui-monospace, Consolas, monospace;
     color-scheme: dark;
   }
   * { box-sizing: border-box; }
-  body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 17px; line-height: 1.55; margin: 0; }
-  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+  body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 17px; line-height: 1.6; margin: 0; overflow-x: hidden; }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
   a { color: inherit; }
-  .wrap { max-width: 1080px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-  .eyebrow { font-family: var(--display); font-weight: 800; font-size: 13px; letter-spacing: .22em; text-transform: uppercase; color: var(--red); }
-  h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: .95; text-transform: uppercase; }
-  h2 { font-size: clamp(34px, 5vw, 52px); font-weight: 800; }
-  h3 { font-size: 22px; font-weight: 700; letter-spacing: .02em; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .mono { font-family: var(--mono); font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+  .mono.red { color: var(--red); }
+  h1, h2, h3 { margin: 0; text-transform: uppercase; text-wrap: balance; }
+  .display { font-family: var(--display); font-weight: 400; line-height: .9; letter-spacing: .01em; }
+  h2.display { font-size: clamp(52px, 8vw, 112px); }
+  h2.display .r { color: var(--red); }
+  h3 { font-family: var(--cond); font-weight: 800; font-size: 24px; letter-spacing: .02em; }
   p { margin: 0; }
-  .lede { color: var(--muted); max-width: 62ch; }
+  .lede { color: var(--muted); max-width: 60ch; font-size: 18px; }
+  .grain { position: absolute; inset: 0; pointer-events: none; opacity: .18; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .5 0'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>"); }
 
-  /* top bar */
-  .top { border-bottom: 1px solid var(--line); background: rgba(11,11,12,.92); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; backdrop-filter: blur(6px); }
-  .top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; }
-  .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-  .brand .mark { width: 10px; height: 34px; background: var(--red); transform: skewX(-12deg); }
-  .brand b { font-family: var(--display); font-weight: 800; letter-spacing: .04em; font-size: 22px; text-transform: lowercase; }
-  .brand small { display: block; font-size: 11px; letter-spacing: .2em; color: var(--muted); font-weight: 600; }
-  nav { display: flex; gap: 22px; font-family: var(--display); font-weight: 600; letter-spacing: .1em; text-transform: uppercase; font-size: 14px; }
-  nav a { text-decoration: none; color: var(--muted); }
-  nav a:hover, nav a:focus-visible { color: var(--fg); }
+  /* loader */
+  #loader { position: fixed; inset: 0; z-index: 50; background: #070707; display: grid; grid-template-rows: auto 1fr auto; padding: 28px 36px; cursor: pointer; }
+  #loader .brand-big { font-family: var(--display); font-size: 28px; color: var(--red); letter-spacing: .04em; }
+  #loader .center { display: grid; align-content: center; justify-items: start; }
+  #loader .center .mono { font-size: 13px; margin-bottom: 8px; }
+  #loader .center .big { font-family: var(--display); font-size: clamp(56px, 12vw, 150px); line-height: .9; color: var(--red); text-shadow: 0 0 40px rgba(255,42,48,.35); }
+  #loader .foot { display: flex; justify-content: space-between; align-items: end; }
+  #loader .pct { font-family: var(--display); font-size: 48px; color: var(--fg); line-height: 1; }
+  #loader .pct small { font-size: 22px; color: var(--red); }
+  #loader[hidden] { display: none; }
+  body.loading { overflow: hidden; }
+
+  /* nav */
+  .top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: rgba(10,10,10,.85); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255,255,255,.06); }
+  .top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding-block: 14px; }
+  .logo { display: inline-grid; grid-template-columns: auto auto; align-items: center; gap: 10px; text-decoration: none; }
+  .logo .box { font-family: var(--display); font-size: 22px; color: #fff; background: var(--red); padding: 2px 10px 0; transform: skew(-8deg); box-shadow: 4px 4px 0 #3a0608; }
+  .logo .box span { display: inline-block; transform: skew(8deg); }
+  .logo .sub { font-family: var(--mono); font-size: 10px; letter-spacing: .2em; color: var(--muted); }
+  nav { display: flex; gap: 26px; font-family: var(--cond); font-weight: 700; font-size: 15px; letter-spacing: .12em; text-transform: uppercase; }
+  nav a { text-decoration: none; color: var(--fg); }
+  nav a.on, nav a:hover, nav a:focus-visible { color: var(--red); }
+  nav a .soon { font-family: var(--mono); font-size: 9px; color: var(--dim); margin-left: 4px; }
 
   /* hero */
-  .hero { position: relative; overflow: hidden; border-bottom: 1px solid var(--line); }
-  .hero .grit { position: absolute; inset: 0; opacity: .35; background:
-      radial-gradient(1200px 500px at 85% 10%, rgba(215,25,31,.22), transparent 60%),
-      repeating-linear-gradient(135deg, rgba(255,255,255,.025) 0 2px, transparent 2px 7px); }
-  .hero .wrap { position: relative; padding-block: 72px 64px; display: grid; grid-template-columns: 1.2fr .8fr; gap: 40px; align-items: end; }
-  .title { font-size: clamp(64px, 11vw, 148px); font-weight: 800; letter-spacing: -.01em; }
-  .title .of { display: block; font-size: .42em; letter-spacing: .12em; color: var(--muted); padding-left: .08em; }
-  .stripe { width: 92px; height: 8px; background: var(--red); margin: 26px 0 18px; clip-path: polygon(0 0, 100% 0, 94% 100%, 4% 100%); }
-  .tag { font-family: var(--display); font-weight: 800; font-size: clamp(26px, 3.4vw, 40px); text-transform: uppercase; letter-spacing: .02em; }
-  .hero .lede { margin-top: 14px; }
-  .cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
-  .btn { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-family: var(--display); font-weight: 800; letter-spacing: .1em; text-transform: uppercase; font-size: 17px; padding: 16px 26px; border: 1px solid var(--line); background: var(--panel); min-width: 0; }
-  .btn.primary { background: linear-gradient(var(--red), #b2101a); border-color: transparent; }
-  .btn.primary:hover, .btn.primary:focus-visible { background: linear-gradient(#f22c32, #c8161c); }
-  .btn:hover, .btn:focus-visible { border-color: var(--muted); }
-  .btn .sub { font-family: var(--body); font-weight: 500; letter-spacing: 0; text-transform: none; font-size: 13px; color: rgba(255,255,255,.75); }
-  .facts { display: grid; gap: 10px; align-self: end; }
-  .fact { display: grid; grid-template-columns: 110px 1fr; gap: 12px; padding: 12px 14px; border: 1px solid var(--line); background: rgba(20,20,22,.8); font-size: 15px; }
-  .fact b { font-family: var(--display); font-weight: 800; letter-spacing: .12em; font-size: 13px; color: var(--red); align-self: center; }
-  .fact span { color: var(--muted); }
+  .hero { position: relative; overflow: hidden; background:
+      radial-gradient(900px 600px at 68% 55%, rgba(227,22,28,.55), transparent 62%),
+      radial-gradient(700px 500px at 20% 90%, rgba(227,22,28,.25), transparent 60%),
+      linear-gradient(180deg, #0c0506 0%, #150506 45%, #090909 100%); }
+  .hero .smoke { position: absolute; inset: -20% -10%; background:
+      radial-gradient(40% 35% at 70% 40%, rgba(255,60,66,.35), transparent 70%),
+      radial-gradient(30% 30% at 85% 70%, rgba(255,42,48,.25), transparent 70%),
+      radial-gradient(35% 30% at 55% 80%, rgba(140,10,14,.5), transparent 70%);
+      filter: blur(30px); animation: drift 14s ease-in-out infinite alternate; }
+  .hero .watermark { position: absolute; right: -2%; top: 8%; font-family: var(--display); font-size: clamp(180px, 36vw, 520px); line-height: 1; color: transparent; -webkit-text-stroke: 2px rgba(255,255,255,.08); user-select: none; pointer-events: none; }
+  .hero .wrap { position: relative; padding-block: 64px 28px; min-height: 560px; display: grid; grid-template-columns: 1.15fr .85fr; gap: 30px; align-items: center; }
+  .hero h1 { font-family: var(--display); font-size: clamp(74px, 13vw, 176px); line-height: .86; color: #fff; text-shadow: 0 10px 40px rgba(0,0,0,.6); }
+  .hero h1 .r { color: var(--red); text-shadow: 0 0 30px rgba(255,42,48,.45), 0 10px 40px rgba(0,0,0,.6); }
+  .hero .meta { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 22px; }
+  .cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+  .btn { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; font-family: var(--cond); font-weight: 800; font-size: 17px; letter-spacing: .14em; text-transform: uppercase; padding: 16px 24px; border: 2px solid rgba(255,255,255,.35); background: rgba(0,0,0,.25); color: #fff; }
+  .btn:hover, .btn:focus-visible { border-color: #fff; }
+  .btn.primary { background: var(--red); border-color: var(--red); box-shadow: 0 0 0 0 rgba(255,42,48,.5); }
+  .btn.primary:hover, .btn.primary:focus-visible { background: #ff2228; box-shadow: 0 0 26px rgba(255,42,48,.45); }
+  .btn svg { width: 18px; height: 18px; flex: none; }
+  .hero .side { display: grid; gap: 10px; }
+  .stat { border: 1px solid rgba(255,255,255,.14); background: rgba(10,10,10,.55); padding: 14px 16px; display: grid; grid-template-columns: 96px 1fr; gap: 12px; align-items: center; }
+  .stat b { font-family: var(--mono); font-size: 11px; letter-spacing: .18em; color: var(--red); }
+  .stat span { color: var(--muted); font-size: 15px; }
+  .hero .strip { position: relative; border-top: 1px solid rgba(255,255,255,.1); }
+  .hero .strip .wrap { min-height: 0; padding-block: 14px; display: flex; justify-content: space-between; gap: 16px; grid-template-columns: none; }
+  @keyframes drift { from { transform: translate3d(-2%, 0, 0) scale(1); } to { transform: translate3d(3%, 2%, 0) scale(1.06); } }
 
-  /* bands */
-  section .wrap { padding-block: 64px; }
-  .band { border-bottom: 1px solid var(--line); }
-  .head { display: grid; gap: 10px; margin-bottom: 34px; }
-  .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-  .card { border: 1px solid var(--line); background: var(--panel); padding: 22px 22px 24px; display: grid; gap: 10px; align-content: start; min-width: 0; }
-  .card h3 { padding-left: 14px; border-left: 4px solid var(--red); }
-  .card p { color: var(--muted); font-size: 15.5px; }
-  .card .size { font-family: var(--mono); font-size: 13px; color: var(--dim); font-variant-numeric: tabular-nums; }
+  /* ticker */
+  .ticker { border-block: 1px solid var(--line); background: var(--bg2); overflow: hidden; white-space: nowrap; }
+  .ticker div { display: inline-block; padding-block: 12px; font-family: var(--cond); font-weight: 800; letter-spacing: .16em; text-transform: uppercase; font-size: 15px; animation: tick 40s linear infinite; }
+  .ticker span { margin: 0 22px; }
+  .ticker .s { color: var(--red); }
+  @keyframes tick { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
-  /* patch list */
-  .patch { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 40px; }
-  .patch div { display: grid; grid-template-columns: 170px 1fr; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line); min-width: 0; }
-  .patch b { font-family: var(--display); font-weight: 700; letter-spacing: .1em; font-size: 15px; padding-left: 12px; border-left: 3px solid var(--red); }
+  /* sections */
+  section .wrap { padding-block: 84px; }
+  .meta-row { display: flex; justify-content: space-between; gap: 16px; border-top: 1px solid var(--line); padding-top: 14px; margin-bottom: 44px; }
+  .head { display: grid; gap: 16px; margin-bottom: 40px; }
+  .band-alt { background: var(--bg2); }
+
+  /* news */
+  .news { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .card { border: 1px solid var(--line); background: var(--panel); padding: 0; display: grid; grid-template-rows: 150px auto; min-width: 0; }
+  .card .art { position: relative; overflow: hidden; background: radial-gradient(120% 90% at 30% 20%, rgba(227,22,28,.6), #1a0607 70%); display: grid; place-items: center; }
+  .card .art b { font-family: var(--display); font-size: 54px; color: rgba(255,255,255,.9); letter-spacing: .04em; transform: rotate(-4deg); text-shadow: 0 6px 20px rgba(0,0,0,.6); }
+  .card .art .date { position: absolute; left: 12px; top: 12px; background: var(--red); color: #fff; font-family: var(--mono); font-size: 10px; letter-spacing: .16em; padding: 4px 8px; }
+  .card .body { padding: 18px 20px 22px; display: grid; gap: 8px; }
+  .card .body p { color: var(--muted); font-size: 15px; }
+
+  /* vs split */
+  .vs { display: grid; grid-template-columns: 1fr auto 1fr; gap: 0; align-items: stretch; border: 1px solid var(--line); background: var(--panel); }
+  .vs .half { padding: 34px 32px 30px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+  .vs .half.right { text-align: right; justify-items: end; }
+  .vs .half .display { font-size: clamp(44px, 6vw, 84px); }
+  .vs .divider { width: 4px; background: linear-gradient(var(--red), transparent 90%); position: relative; }
+  .vs .divider i { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) skew(-8deg); background: var(--red); color: #fff; font-style: normal; font-family: var(--display); font-size: 20px; padding: 4px 12px; }
+  .vs ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; color: var(--muted); font-size: 15.5px; }
+  .vs li b { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; color: var(--fg); margin-right: 10px; }
+  .vs .half.right li b { margin: 0 0 0 10px; }
+
+  /* restored list */
+  .patch { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 48px; }
+  .patch div { display: grid; grid-template-columns: 180px 1fr; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--line); min-width: 0; }
+  .patch b { font-family: var(--cond); font-weight: 800; letter-spacing: .12em; font-size: 15px; padding-left: 12px; border-left: 3px solid var(--red); }
   .patch span { color: var(--muted); font-size: 15.5px; }
 
-  /* steps (a real sequence) */
-  .steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; counter-reset: step; }
-  .step { border: 1px solid var(--line); background: var(--panel); padding: 22px; display: grid; gap: 10px; align-content: start; min-width: 0; position: relative; }
-  .step::before { counter-increment: step; content: counter(step); display: grid; place-items: center; width: 34px; height: 34px; background: var(--red); color: #fff; font-family: var(--display); font-weight: 800; font-size: 18px; }
+  /* steps */
+  .steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+  .step { border: 1px solid var(--line); background: var(--panel); padding: 24px 22px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+  .step .n { font-family: var(--display); font-size: 40px; color: var(--red); line-height: 1; }
   .step p { color: var(--muted); font-size: 15.5px; }
-  .step code { font-family: var(--mono); font-size: 13.5px; background: #0b0b0c; border: 1px solid var(--line); padding: 2px 6px; }
+  .step code { font-family: var(--mono); font-size: 12px; background: #0a0a0a; border: 1px solid var(--line); padding: 2px 6px; }
 
   /* requirements */
-  .req { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-  .req div { border: 1px solid var(--line); padding: 18px 20px; display: grid; gap: 6px; min-width: 0; }
-  .req b { font-family: var(--display); font-weight: 800; letter-spacing: .08em; font-size: 17px; }
+  .req { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .req div { border: 1px solid var(--line); padding: 22px; display: grid; gap: 8px; min-width: 0; background: var(--panel); }
+  .req b { font-family: var(--cond); font-weight: 800; letter-spacing: .1em; font-size: 20px; }
   .req span { color: var(--muted); font-size: 15px; }
-  .note { margin-top: 18px; color: var(--muted); font-size: 15px; max-width: 70ch; }
-  .note .ok { color: var(--green); font-weight: 600; }
+  .note { margin-top: 20px; color: var(--muted); font-size: 15px; max-width: 70ch; }
+  .note .ok { color: var(--green); font-family: var(--mono); font-size: 12px; letter-spacing: .14em; }
 
   /* faq */
-  .faq { display: grid; gap: 0; max-width: 760px; }
+  .faq { max-width: 820px; }
   .faq details { border-bottom: 1px solid var(--line); }
-  .faq summary { cursor: pointer; list-style: none; padding: 16px 0; font-family: var(--display); font-weight: 700; font-size: 20px; letter-spacing: .02em; text-transform: uppercase; display: flex; justify-content: space-between; gap: 16px; }
-  .faq summary::after { content: "+"; color: var(--red); font-weight: 800; }
+  .faq summary { cursor: pointer; list-style: none; padding: 20px 0; display: grid; grid-template-columns: 48px 1fr auto; gap: 16px; align-items: center; font-family: var(--cond); font-weight: 800; font-size: 22px; letter-spacing: .03em; text-transform: uppercase; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary .n { font-family: var(--mono); font-size: 12px; color: var(--red); }
+  .faq summary::after { content: "+"; color: var(--red); font-family: var(--display); font-size: 26px; }
   .faq details[open] summary::after { content: "\2013"; }
   .faq summary:focus-visible { outline: 2px solid var(--red); outline-offset: 4px; }
-  .faq p { color: var(--muted); padding-bottom: 18px; max-width: 65ch; }
+  .faq p { color: var(--muted); padding: 0 0 20px 64px; max-width: 66ch; }
 
-  /* download */
+  /* download band */
+  .download { position: relative; overflow: hidden; background: radial-gradient(800px 400px at 50% 110%, rgba(227,22,28,.45), transparent 65%), var(--bg2); border-top: 1px solid var(--line); }
   .download .wrap { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; }
-  .dl-box { border: 1px solid var(--line); background: var(--panel); padding: 26px; display: grid; gap: 14px; }
+  .dl-box { border: 1px solid var(--line); background: rgba(10,10,10,.7); padding: 26px; display: grid; gap: 12px; }
   .dl-box .row { display: flex; justify-content: space-between; gap: 16px; font-size: 15px; border-bottom: 1px solid var(--line); padding-bottom: 10px; }
-  .dl-box .row span:first-child { color: var(--muted); }
-  .dl-box .row span:last-child { font-family: var(--mono); font-size: 13.5px; font-variant-numeric: tabular-nums; text-align: right; }
-  .pending { font-size: 14px; color: var(--muted); }
-  .pending b { color: #e8a800; }
+  .dl-box .row span:first-child { font-family: var(--mono); font-size: 11px; letter-spacing: .14em; color: var(--dim); text-transform: uppercase; align-self: center; }
+  .dl-box .row span:last-child { font-family: var(--mono); font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; }
+  .pending { font-size: 14px; color: var(--muted); margin-top: 14px; }
+  .pending b { color: #e8a800; font-family: var(--mono); font-size: 11px; letter-spacing: .14em; }
 
-  footer .wrap { padding-block: 34px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; color: var(--dim); font-size: 13.5px; }
+  /* community */
+  .community .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; align-items: center; }
+  .discord { border: 2px dashed var(--line); padding: 30px; display: grid; gap: 10px; justify-items: start; }
+  footer { border-top: 1px solid var(--line); }
+  footer .wrap { padding-block: 30px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; color: var(--dim); font-size: 13px; }
 
-  @media (max-width: 820px) {
-    .hero .wrap { grid-template-columns: 1fr; }
-    .grid, .req, .steps { grid-template-columns: 1fr 1fr; }
-    .patch { grid-template-columns: 1fr; }
-    .download .wrap { grid-template-columns: 1fr; }
+  @media (max-width: 900px) {
+    .hero .wrap { grid-template-columns: 1fr; min-height: 0; }
+    .hero .watermark { display: none; }
     nav { display: none; }
+    .news, .req, .steps { grid-template-columns: 1fr 1fr; }
+    .vs { grid-template-columns: 1fr; }
+    .vs .divider { height: 4px; width: auto; background: linear-gradient(90deg, var(--red), transparent); }
+    .vs .half.right { text-align: left; justify-items: start; }
+    .vs .half.right li b { margin: 0 10px 0 0; }
+    .patch { grid-template-columns: 1fr; }
+    .download .wrap, .community .wrap { grid-template-columns: 1fr; }
   }
-  @media (max-width: 520px) {
-    .grid, .req, .steps { grid-template-columns: 1fr; }
+  @media (max-width: 540px) {
+    .news, .req, .steps { grid-template-columns: 1fr; }
     .patch div { grid-template-columns: 1fr; gap: 4px; }
-    .fact { grid-template-columns: 1fr; gap: 2px; }
-    section .wrap { padding-block: 48px; }
+    .stat { grid-template-columns: 1fr; gap: 2px; }
+    section .wrap { padding-block: 56px; }
+    .faq p { padding-left: 0; }
+    .faq summary { grid-template-columns: 1fr auto; }
+    .faq summary .n { display: none; }
   }
-  @media (prefers-reduced-motion: no-preference) {
-    .hero .title { animation: rise .6s ease-out both; }
-    .hero .tag, .hero .lede, .hero .cta { animation: rise .6s ease-out .12s both; }
-    @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .hero .smoke, .ticker div { animation: none; }
   }
 </style>
 </head>
 <body>
 
 
+<div id="loader" role="button" tabindex="0" aria-label="Skip the intro">
+  <div class="brand-big">h1z1.app</div>
+  <div class="center">
+    <div class="mono">Entering the</div>
+    <div class="big">2017 BUILD</div>
+  </div>
+  <div class="foot">
+    <div><div class="pct"><span id="pct">0</span><small>%</small></div><div class="mono" style="margin-top:6px">Loading the arena</div></div>
+    <div class="mono">Click to skip</div>
+  </div>
+</div>
+
 <header class="top">
   <div class="wrap">
-    <a class="brand" href="#top"><span class="mark"></span><span><b>h1z1.app</b><small>KING OF THE KILL · 2017</small></span></a>
+    <a class="logo" href="#top"><span class="box"><span>h1z1.app</span></span><span class="sub">KOTK · 2017</span></a>
     <nav>
-      <a href="#whats-in">What's in it</a>
-      <a href="#restored">Restored</a>
+      <a class="on" href="#top">Home</a>
+      <a href="#news">What's new</a>
+      <a href="#whats-in">The build</a>
       <a href="#install">Install</a>
       <a href="#faq">FAQ</a>
-      <a href="#download">Download</a>
+      <a href="#community">Discord <span class="soon">soon</span></a>
     </nav>
   </div>
 </header>
 
 <section class="hero" id="top">
-  <div class="grit" aria-hidden="true"></div>
+  <div class="smoke" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="watermark" aria-hidden="true">2017</div>
   <div class="wrap">
     <div>
-      <div class="eyebrow">H1Z1 · Battle Royale · September 2017</div>
-      <h1 class="title">King<span class="of">of the</span>Kill</h1>
-      <div class="stripe" aria-hidden="true"></div>
-      <div class="tag">Back to 2017.</div>
-      <p class="lede">The September 2017 King of the Kill, running on your own computer. One download gives you the game client, a local server with the 2017 rules and a launcher that starts both with one button.</p>
+      <div class="mono red">H1Z1 · King of the Kill · September 2017</div>
+      <h1 style="margin-top:14px">Drop in.<br>It's<br><span class="r">2017.</span></h1>
+      <div class="meta">
+        <span class="mono">Local server</span><span class="mono">/</span><span class="mono">Training Ground</span><span class="mono">/</span><span class="mono">2017 guns</span><span class="mono">/</span><span class="mono">Your skins</span>
+      </div>
       <div class="cta">
-        <a class="btn primary" id="dl-hero" href="#download">Download setup <span class="sub">1 MB · installs 16 GB</span></a>
-        <a class="btn" href="#install">How to install</a>
+        <a class="btn primary" id="dl-hero" href="#download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m6 11 6 6 6-6"/><path d="M4 21h16"/></svg>Download setup</a>
+        <a class="btn" href="#install">How it works</a>
       </div>
     </div>
-    <div class="facts">
-      <div class="fact"><b>CLIENT</b><span>0.0.134.227809 — the last September 2017 build</span></div>
-      <div class="fact"><b>MODE</b><span>Training Ground with bots, every gun laid out around you</span></div>
-      <div class="fact"><b>SERVER</b><span>Runs locally on your PC. No account, no internet needed to play</span></div>
+    <div class="side">
+      <div class="stat"><b>CLIENT</b><span>0.0.134.227809 — the last September 2017 build, patched to run on your own server</span></div>
+      <div class="stat"><b>MODE</b><span>Training Ground with bots in 2017 gear and every gun laid out around you</span></div>
+      <div class="stat"><b>ACCOUNT</b><span>None. The server runs on your PC; no login, no internet needed to play</span></div>
+    </div>
+  </div>
+  <div class="strip">
+    <div class="wrap">
+      <span class="mono">Built for the nostalgia.</span>
+      <span class="mono">Explore ↓</span>
+      <span class="mono">H1Z1 · King of the Kill</span>
     </div>
   </div>
 </section>
 
-<section class="band" id="whats-in">
+<div class="ticker" aria-hidden="true"><div>
+  <span>One download</span><span class="s">/</span><span>Training Ground</span><span class="s">/</span><span>2017 recoil</span><span class="s">/</span><span>Your skins</span><span class="s">/</span><span>Local server</span><span class="s">/</span><span>No account</span><span class="s">/</span>
+  <span>One download</span><span class="s">/</span><span>Training Ground</span><span class="s">/</span><span>2017 recoil</span><span class="s">/</span><span>Your skins</span><span class="s">/</span><span>Local server</span><span class="s">/</span><span>No account</span><span class="s">/</span>
+</div></div>
+
+<section id="news">
   <div class="wrap">
+    <div class="meta-row"><span class="mono">New / latest news</span><span class="mono">November 2026</span></div>
     <div class="head">
-      <div class="eyebrow">What's in the download</div>
-      <h2>Everything in one setup</h2>
-      <p class="lede">Run Setup.exe, choose a folder, and it installs all three parts. When it finishes it opens the launcher by itself.</p>
+      <h2 class="display">What's<br><span class="r">new.</span></h2>
+      <p class="lede">Fixes, new features and what changed in the build. The newest at the top.</p>
     </div>
-    <div class="grid">
-      <div class="card"><h3>Game client</h3><p>The patched 2017 client, ready to connect to the local server. No Steam, no Daybreak login.</p><span class="size">15.6 GB · depot_433851</span></div>
-      <div class="card"><h3>Server + launcher</h3><p>The private server with every 2017 fix, plus the launcher: one PLAY button, a Testing / Stable build switch, and a file check for the game.</p><span class="size">650 MB · Node.js</span></div>
-      <div class="card"><h3>Your character</h3><p>A ready character with skins, so you load straight into the Training Ground instead of an empty wardrobe.</p><span class="size">saves · %APPDATA%\2017KOTK</span></div>
+    <div class="news">
+      <div class="card"><div class="art"><span class="date">November 5, 2026</span><b>SETUP</b></div><div class="body"><h3>One small installer</h3><p>Setup.exe is 1 MB now. It downloads the game, the server and the launcher straight into your folder, resumes if the connection drops, and opens the launcher when it's done.</p></div></div>
+      <div class="card"><div class="art"><span class="date">November 5, 2026</span><b>ARMORY</b></div><div class="body"><h3>Every gun at spawn</h3><p>Load into the Training Ground and every gun lies in a ring around you with its ammo. Bots wear the 2017 hoodie, pants and the black moto helmet.</p></div></div>
+      <div class="card"><div class="art"><span class="date">November 5, 2026</span><b>LAUNCHER</b></div><div class="body"><h3>Testing, Stable, Verify</h3><p>The launcher settings pick the Testing or Stable build, point at your game folder, and check every game file against the known-good list, with repair.</p></div></div>
     </div>
   </div>
 </section>
 
-<section class="band" id="restored">
+<section class="band-alt" id="whats-in">
   <div class="wrap">
+    <div class="meta-row"><span class="mono">01 / What you get</span><span class="mono">Client vs server</span><span class="mono">H1Z1 / KOTK</span></div>
     <div class="head">
-      <div class="eyebrow">Restored so far</div>
-      <h2>How it played in 2017</h2>
-      <p class="lede">The 2016 server code only knew the old game. These are the parts rebuilt to match the September 2017 client.</p>
+      <h2 class="display">The real client.<br><span class="r">Your own server.</span></h2>
+      <p class="lede">The game is the real September 2017 build. The server that runs it is rebuilt from scratch to speak its language. Both come down in one install.</p>
+    </div>
+    <div class="vs">
+      <div class="half">
+        <span class="mono red">Client / 0.0.134</span>
+        <div class="display">The<br>Game</div>
+        <p class="lede" style="font-size:16px">The last King of the Kill build before the Z2 wipe, with the files patched to connect locally.</p>
+        <ul>
+          <li><b>15.6 GB</b>the full client, nothing stripped</li>
+          <li><b>SKINS</b>gun, clothing, helmet and backpack skins render</li>
+          <li><b>MENU</b>Play tab with the Training Ground mode</li>
+          <li><b>NO STEAM</b>starts from the launcher, no login</li>
+        </ul>
+      </div>
+      <div class="divider"><i>VS</i></div>
+      <div class="half right">
+        <span class="mono red">Server / local</span>
+        <div class="display">The<br>Server</div>
+        <p class="lede" style="font-size:16px">A private server with the 2017 rules, started and stopped by the launcher on your own PC.</p>
+        <ul>
+          <li><b>650 MB</b>server, launcher and tools</li>
+          <li><b>2017</b>recoil, fire rates, damage and armor from the guide</li>
+          <li><b>BOTS</b>targets that show in the kill feed as Bot 1, 2, 3</li>
+          <li><b>SAVES</b>a ready character with skins, in %APPDATA%\2017KOTK</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="restored">
+  <div class="wrap">
+    <div class="meta-row"><span class="mono">02 / Restored</span><span class="mono">How it played in 2017</span></div>
+    <div class="head">
+      <h2 class="display">Rebuilt<br><span class="r">piece by piece.</span></h2>
     </div>
     <div class="patch">
       <div><b>AK-47</b><span>2017 recoil, fire rate and the v4 gunshot</span></div>
@@ -214,71 +338,84 @@
   </div>
 </section>
 
-<section class="band" id="install">
+<section class="band-alt" id="install">
   <div class="wrap">
+    <div class="meta-row"><span class="mono">03 / Install</span><span class="mono">About ten minutes plus the download</span></div>
     <div class="head">
-      <div class="eyebrow">Install</div>
-      <h2>Four steps, about ten minutes</h2>
+      <h2 class="display">Four steps.<br><span class="r">Then play.</span></h2>
     </div>
     <div class="steps">
-      <div class="step"><h3>Download</h3><p>Get <code>Setup.exe</code> (1 MB). Windows may warn about an unknown publisher: choose More info → Run anyway.</p></div>
-      <div class="step"><h3>Run Setup.exe</h3><p>Pick the install folder; it needs about 18 GB free. Setup downloads the game, server and launcher straight into it, and resumes if the connection drops.</p></div>
-      <div class="step"><h3>Requirements</h3><p>Setup checks for Node.js, Git for Windows and Python 3. Anything missing installs with one click.</p></div>
-      <div class="step"><h3>Press PLAY</h3><p>The launcher opens by itself. Press PLAY, then in the game menu choose <code>PLAY</code> → <code>TRAINING GROUND</code>.</p></div>
+      <div class="step"><span class="n">01</span><h3>Download</h3><p>Get <code>Setup.exe</code> (1 MB). Windows may warn about an unknown publisher: choose More info → Run anyway.</p></div>
+      <div class="step"><span class="n">02</span><h3>Run Setup.exe</h3><p>Pick the install folder; it needs about 18 GB free. Setup downloads the game, server and launcher into it, and resumes if the connection drops.</p></div>
+      <div class="step"><span class="n">03</span><h3>Requirements</h3><p>Setup checks for Node.js, Git for Windows and Python 3. Anything missing installs with one click.</p></div>
+      <div class="step"><span class="n">04</span><h3>Press PLAY</h3><p>The launcher opens by itself. Press PLAY, then in the game menu choose <code>PLAY</code> → <code>TRAINING GROUND</code>.</p></div>
     </div>
   </div>
 </section>
 
-<section class="band" id="requirements">
+<section id="requirements">
   <div class="wrap">
-    <div class="head">
-      <div class="eyebrow">Requirements</div>
-      <h2>What your PC needs</h2>
-    </div>
+    <div class="meta-row"><span class="mono">04 / Requirements</span><span class="mono">What your PC needs</span></div>
     <div class="req">
       <div><b>WINDOWS 10 / 11</b><span>64-bit. The server and the game run on the same PC.</span></div>
-      <div><b>17 GB FREE</b><span>16 GB game client plus the server. An SSD makes loading much faster.</span></div>
+      <div><b>18 GB FREE</b><span>16 GB game client plus the server and a 2 GB download buffer. An SSD loads much faster.</span></div>
       <div><b>THREE FREE TOOLS</b><span>Node.js runs the server, Git for Windows provides bash for the start scripts, Python 3 runs the game helpers.</span></div>
     </div>
     <p class="note">The setup wizard checks all three and shows <span class="ok">FOUND</span> or <span class="ok">MISSING</span> for each, with an install button for the missing ones. Nothing else to configure.</p>
   </div>
 </section>
 
-<section class="band" id="faq">
+<section class="band-alt" id="faq">
   <div class="wrap">
+    <div class="meta-row"><span class="mono">05 / FAQ</span><span class="mono">The short answers</span></div>
     <div class="head">
-      <div class="eyebrow">FAQ</div>
-      <h2>Questions</h2>
+      <h2 class="display">Before<br><span class="r">you drop.</span></h2>
     </div>
     <div class="faq">
-      <details><summary>Can I play with friends?</summary><p>Not yet. The server runs on your own PC and the Training Ground is single player with bots. Multiplayer is the next big piece.</p></details>
-      <details><summary>Is this the real 2017 game?</summary><p>The client is the real 0.0.134 build from September 2017. The server side is rebuilt from scratch, so some things are still missing. The Restored list above is what works today.</p></details>
-      <details><summary>Something looks broken. What do I check first?</summary><p>Open the launcher's settings (the gear) and press Verify game files. It checks every file of the game against the known-good list and can repair damaged ones from the setup package.</p></details>
-      <details><summary>Testing or Stable build?</summary><p>Testing is the newest server build and gets the fixes first. Stable is the last build frozen as known good. Switch between them in the launcher settings; PLAY starts whichever is selected.</p></details>
-      <details><summary>Does it touch my Steam install?</summary><p>No. It installs into its own folder and saves to %APPDATA%\2017KOTK. Steam and the live game are not involved.</p></details>
+      <details><summary><span class="n">01</span>Can I play with friends?</summary><p>Not yet. The server runs on your own PC and the Training Ground is single player with bots. Multiplayer is the next big piece.</p></details>
+      <details><summary><span class="n">02</span>Is this the real 2017 game?</summary><p>The client is the real 0.0.134 build from September 2017. The server side is rebuilt from scratch, so some things are still missing. The Restored list above is what works today.</p></details>
+      <details><summary><span class="n">03</span>Something looks broken. What do I check first?</summary><p>Open the launcher's settings (the gear) and press Verify game files. It checks every file of the game against the known-good list and can repair damaged ones.</p></details>
+      <details><summary><span class="n">04</span>Testing or Stable build?</summary><p>Testing is the newest server build and gets the fixes first. Stable is the last build frozen as known good. Switch between them in the launcher settings; PLAY starts whichever is selected.</p></details>
+      <details><summary><span class="n">05</span>Does it touch my Steam install?</summary><p>No. It installs into its own folder and saves to %APPDATA%\2017KOTK. Steam and the live game are not involved.</p></details>
+      <details><summary><span class="n">06</span>Is this official?</summary><p>No. It's a fan project and has nothing to do with Daybreak Game Company.</p></details>
     </div>
   </div>
 </section>
 
 <section class="download" id="download">
+  <div class="grain" aria-hidden="true"></div>
   <div class="wrap">
     <div>
-      <div class="eyebrow">Download</div>
-      <h2>Get the setup</h2>
-      <p class="lede" style="margin-top:12px">A 1 MB setup that downloads the game, the server and the launcher for you. Run it, pick a folder, play.</p>
+      <div class="mono red">Download</div>
+      <h2 class="display" style="margin-top:10px">Get the<br><span class="r">setup.</span></h2>
+      <p class="lede" style="margin-top:16px">A 1 MB setup that downloads the game, the server and the launcher for you. Run it, pick a folder, play.</p>
       <div class="cta">
-        <a class="btn primary" id="dl" href="#download">Download Setup.exe <span class="sub">1 MB</span></a>
+        <a class="btn primary" id="dl" href="#download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m6 11 6 6 6-6"/><path d="M4 21h16"/></svg>Download Setup.exe</a>
       </div>
-      <p class="pending" id="pending"><b>Not available yet:</b> the 16 GB build is still uploading. Check back in a few hours; the button goes live by itself.</p>
+      <p class="pending" id="pending"><b>Not available yet</b> — the 16 GB build is still uploading. Check back in about an hour; the button goes live by itself.</p>
     </div>
     <div class="dl-box">
-      <div class="row"><span>File</span><span>Setup.exe</span></div>
+      <div class="row"><span>File</span><span>Setup.exe · 1 MB</span></div>
       <div class="row"><span>Download</span><span>about 16 GB, in 2 GB pieces</span></div>
       <div class="row"><span>Client</span><span>0.0.134.227809</span></div>
       <div class="row"><span>Runs on</span><span>Windows 10 / 11, 64-bit</span></div>
       <div class="row"><span>Needs</span><span>Node.js · Git · Python 3</span></div>
-      <div class="row"><span>Installs to</span><span>a folder you choose (18 GB free)</span></div>
       <div class="row"><span>Source</span><span><a href="https://github.com/kryontt/h1z1-app" target="_blank" rel="noopener">github.com/kryontt/h1z1-app</a></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="community" id="community">
+  <div class="wrap">
+    <div>
+      <div class="mono red">Community</div>
+      <h2 class="display" style="margin-top:10px">No solo<br><span class="r">legends.</span></h2>
+      <p class="lede" style="margin-top:16px">Test sessions, feedback and patch notes will go through Discord once the first players are in.</p>
+    </div>
+    <div class="discord">
+      <span class="mono">Discord</span>
+      <h3>Opening soon</h3>
+      <p class="lede" style="font-size:15px">Until then, bug reports and ideas go to the GitHub page linked above.</p>
     </div>
   </div>
 </section>
@@ -291,8 +428,8 @@
 </footer>
 
 <script>
-  // Download link: set DOWNLOAD_URL once the zip is uploaded; the button and the note follow.
-  var DOWNLOAD_URL = "";  // set to the release's Setup.exe once the upload is live
+  // Download link: set DOWNLOAD_URL once the release is live; both buttons and the note follow.
+  var DOWNLOAD_URL = "";
   (function () {
     var p = document.getElementById("pending");
     ["dl", "dl-hero"].forEach(function (id) {
@@ -300,6 +437,19 @@
       if (DOWNLOAD_URL) { a.href = DOWNLOAD_URL; a.target = "_blank"; a.rel = "noopener"; }
     });
     if (DOWNLOAD_URL) p.hidden = true;
+  })();
+  // intro: a short loading screen, click or key to skip, none when motion is reduced
+  (function () {
+    var l = document.getElementById("loader"), pct = document.getElementById("pct");
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) { l.hidden = true; return; }
+    document.body.classList.add("loading");
+    var t0 = Date.now(), dur = 1400, done = false;
+    function finish() { if (done) return; done = true; l.hidden = true; document.body.classList.remove("loading"); }
+    function tick() { if (done) return; var k = Math.min(1, (Date.now() - t0) / dur); pct.textContent = Math.round(k * 100); if (k < 1) requestAnimationFrame(tick); else setTimeout(finish, 150); }
+    l.addEventListener("click", finish);
+    l.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " " || e.key === "Escape") finish(); });
+    requestAnimationFrame(tick);
   })();
 </script>
 
